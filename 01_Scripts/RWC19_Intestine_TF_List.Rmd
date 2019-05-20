@@ -21,6 +21,8 @@ To do:
   - onish
   - tintori
 - add stage column to metadata table
+- add sophie EMS data
+- add dineen et al 2017 data
 
 
 Pull in data. Paths are relative to where the R markdown file lives.
@@ -29,11 +31,8 @@ Pull in data. Paths are relative to where the R markdown file lives.
 ## Fuxman Bass JI, Pons C, Kozlowski L, et al. Mol Syst Biol. 2016;12(10):884. doi:10.15252/MSB.20167131
 
 ```{r}
-
-getwd()
-
 # worm transcription factor 3 database from the walhout lab
-wTF3 <- read.delim("../../10_DATASETS/05_TF3_0/TF3-0_namesonly.txt", na.strings = c("", "NA"))
+wTF3 <- read.delim("../02_Data/0_TF3_0/TF3-0_namesonly.txt", na.strings = c("", "NA"))
 wTF3 <- wTF3 %>% select(Sequence.name, Public_name, WBGeneID, DBD) %>% na.omit()
 
 # initialize blank dataframe
@@ -50,7 +49,8 @@ RWC19_Metadata <- data.frame(column_ID = colnames(wTF3))
 RWC19_Metadata <- RWC19_Metadata %>% 
   mutate(column_detail = c("Cosmid, fosmid or YAC derived gene name", "Accepted gene name", "Unique wormbase accession number", "DNA binding domain")) %>% 
   mutate(source_DOI = "10.15252/msb.20167131") %>%
-  mutate(source_detail = "Dataset EV3")
+  mutate(source_detail = "Dataset EV3") %>%
+  mutate(seq_method = "NA")
 
 ```
 
@@ -58,7 +58,7 @@ RWC19_Metadata <- RWC19_Metadata %>%
 
 ```{r}
 # TFs from Erin's adult intestine RNA-seq that I processed. see `intestine_tfs.Rmd`
-onish_adult <- read.csv("../../10_DATASETS/18_Hand_Dissected_Adult_Intestine_RNA-seq/171214_res_gutsVwt_DESeq.csv")
+onish_adult <- read.csv("../02_Data/8_Hand_Dissected_Adult_Intestine_RNA-seq/171214_res_gutsVwt_DESeq.csv")
 
 # give the columns orgin-relevant names
 colnames(onish_adult) <- str_c("onish_adult_",colnames(onish_adult))
@@ -81,37 +81,44 @@ RWC19_Metadata <- RWC19_Metadata %>% add_row(
   column_ID = colnames(onish_adult_enriched[1]),
   column_detail = "Sequence name from UCSC GTF file",
   source_DOI = "unpublsihed",
-  source_detail = "RNA-seq of hand dissected adult intestine from the McGhee lab"
+  source_detail = "RNA-seq of hand dissected adult intestine from the McGhee lab",
+  seq_method = "Illumina"
   ) %>% add_row(
   column_ID = colnames(onish_adult_enriched[2]),
   column_detail = "Mean expression of gene determined by DESeq2",
   source_DOI = "unpublsihed",
-  source_detail = "RNA-seq of hand dissected adult intestine from the McGhee lab" 
+  source_detail = "RNA-seq of hand dissected adult intestine from the McGhee lab",
+  seq_method = "Illumina"
   ) %>% add_row(
   column_ID = colnames(onish_adult_enriched[3]),
   column_detail = "Log2(Fold Change) of gene determined by DESeq2. Greater than zero is enriched in the intestine. Less than zero is enriched in whole adult worms",
   source_DOI = "unpublsihed",
-  source_detail = "RNA-seq of hand dissected adult intestine from the McGhee lab"    
+  source_detail = "RNA-seq of hand dissected adult intestine from the McGhee lab",
+  seq_method = "Illumina"
   ) %>% add_row(
   column_ID = colnames(onish_adult_enriched[4]),
   column_detail = "Log2(Fold Change) unshrunken maximum likelihood estimate of gene determined by DESeq2. Used for plots and gene ranks",
   source_DOI = "unpublsihed",
-  source_detail = "RNA-seq of hand dissected adult intestine from the McGhee lab"  
+  source_detail = "RNA-seq of hand dissected adult intestine from the McGhee lab",
+  seq_method = "Illumina"
   ) %>% add_row(
   column_ID = colnames(onish_adult_enriched[5]),
   column_detail = "Wald statistic of gene determined by DESeq2",
   source_DOI = "unpublsihed",
-  source_detail = "RNA-seq of hand dissected adult intestine from the McGhee lab"  
+  source_detail = "RNA-seq of hand dissected adult intestine from the McGhee lab",
+  seq_method = "Illumina"
   ) %>% add_row(
   column_ID = colnames(onish_adult_enriched[6]),
   column_detail = "p-value of gene determined by DESeq2",
   source_DOI = "unpublsihed",
-  source_detail = "RNA-seq of hand dissected adult intestine from the McGhee lab"  
+  source_detail = "RNA-seq of hand dissected adult intestine from the McGhee lab",
+  seq_method = "Illumina"
   ) %>% add_row(
   column_ID = colnames(onish_adult_enriched[7]),
   column_detail = "Adjusted p-value of gene determined by DESeq2",
   source_DOI = "unpublsihed",
-  source_detail = "RNA-seq of hand dissected adult intestine from the McGhee lab"  
+  source_detail = "RNA-seq of hand dissected adult intestine from the McGhee lab",
+  seq_method = "Illumina"
   )
 
 ```
@@ -122,7 +129,7 @@ RWC19_Metadata <- RWC19_Metadata %>% add_row(
 ```{r}
 # Transcripts from embryonic 1E intestine from Sophie's single cell RNA-seq paper. See `intestine_tfs.Rmd`
 tintori_columns <- c("gene", "p.value", "log.CPM", "log.FC")
-tintori_1E <- read.csv("../../10_DATASETS/17_Tintori_et_al_2016_Embryo_scRNA-seq/8cell_vs_1E_p1_00.csv")
+tintori_1E <- read.csv("../02_Data/7_Tintori_et_al_2016_Embryo_scRNA-seq/8cell_vs_1E_p1_00.csv")
 colnames(tintori_1E) <- str_c("tintori_1E_", tintori_columns)
 
 int_TF_df <- merge(x = int_TF_df, y = tintori_1E, by.x = "Public_name", by.y = "tintori_1E_gene", all.x = T)
@@ -134,7 +141,7 @@ tintori_1E_enriched <- int_TF_df %>% filter(int_TF_df$tintori_1E_p.value <= 0.05
 int_TF_df <- int_TF_df %>% mutate(tintori_1E_bool = if_else(int_TF_df$WBGeneID %in% tintori_1E_enriched$WBGeneID, TRUE, FALSE))
 
 # Transcripts from embryonic 2Ep intestine from Sophie's single cell RNA-seq paper. See `intestine_tfs.Rmd`
-tintori_2Ep <- read.csv("../../10_DATASETS/17_Tintori_et_al_2016_Embryo_scRNA-seq/16cell_vs_Ep_p1_00.csv")
+tintori_2Ep <- read.csv("../02_Data/7_Tintori_et_al_2016_Embryo_scRNA-seq/16cell_vs_Ep_p1_00.csv")
 colnames(tintori_2Ep) <- str_c("tintori_2Ep_", tintori_columns)
 
 int_TF_df <- merge(x = int_TF_df, y = tintori_2Ep, by.x = "Public_name", by.y = "tintori_2Ep_gene", all.x = T)
@@ -150,44 +157,52 @@ RWC19_Metadata <- RWC19_Metadata %>% add_row(
   column_ID = colnames(tintori_1E[1]),
   column_detail = "Gene sequence name",
   source_DOI = "10.1016/j.devcel.2016.07.025",
-  source_detail = "Single cell RNA-seq of hand dissected embryo. Accessed from tintori.bio.unc.edu."
+  source_detail = "Single cell RNA-seq of hand dissected embryo. Accessed from tintori.bio.unc.edu.",
+  seq_method = "Illumina"
   ) %>% add_row(
   column_ID = colnames(tintori_1E[2]),
   column_detail = "Gene p-value",
   source_DOI = "10.1016/j.devcel.2016.07.025",
-  source_detail = "Single cell RNA-seq of hand dissected embryo. Accessed from tintori.bio.unc.edu."
+  source_detail = "Single cell RNA-seq of hand dissected embryo. Accessed from tintori.bio.unc.edu.",
+  seq_method = "Illumina"
   ) %>% add_row(
   column_ID = colnames(tintori_1E[3]),
   column_detail = "Counts per transcript per million mapped reads.",
   source_DOI = "10.1016/j.devcel.2016.07.025",
-  source_detail = "Single cell RNA-seq of hand dissected embryo. Accessed from tintori.bio.unc.edu."
+  source_detail = "Single cell RNA-seq of hand dissected embryo. Accessed from tintori.bio.unc.edu.",
+  seq_method = "Illumina"
   ) %>% add_row(
   column_ID = colnames(tintori_1E[4]),
   column_detail = "Log2(Fold Change) of gene in the 1E cell when compared to the whole embryo. Less than zero is enriched in the 1E cell. Greater than zero is enriched in the whole 8 cell embryo",
   source_DOI = "10.1016/j.devcel.2016.07.025",
-  source_detail = "Single cell RNA-seq of hand dissected embryo. Accessed from tintori.bio.unc.edu."
+  source_detail = "Single cell RNA-seq of hand dissected embryo. Accessed from tintori.bio.unc.edu.",
+  seq_method = "Illumina"
   )
 
 RWC19_Metadata <- RWC19_Metadata %>% add_row(
   column_ID = colnames(tintori_2Ep[1]),
   column_detail = "Gene sequence name",
   source_DOI = "10.1016/j.devcel.2016.07.025",
-  source_detail = "Single cell RNA-seq of hand dissected embryo. Accessed from tintori.bio.unc.edu."
+  source_detail = "Single cell RNA-seq of hand dissected embryo. Accessed from tintori.bio.unc.edu.",
+  seq_method = "Illumina"
   ) %>% add_row(
   column_ID = colnames(tintori_2Ep[2]),
   column_detail = "Gene p-value",
   source_DOI = "10.1016/j.devcel.2016.07.025",
-  source_detail = "Single cell RNA-seq of hand dissected embryo. Accessed from tintori.bio.unc.edu."
+  source_detail = "Single cell RNA-seq of hand dissected embryo. Accessed from tintori.bio.unc.edu.",
+  seq_method = "Illumina"
   ) %>% add_row(
   column_ID = colnames(tintori_2Ep[3]),
   column_detail = "Counts per transcript per million mapped reads.",
   source_DOI = "10.1016/j.devcel.2016.07.025",
-  source_detail = "Single cell RNA-seq of hand dissected embryo. Accessed from tintori.bio.unc.edu."
+  source_detail = "Single cell RNA-seq of hand dissected embryo. Accessed from tintori.bio.unc.edu.",
+  seq_method = "Illumina"
   ) %>% add_row(
   column_ID = colnames(tintori_2Ep[4]),
   column_detail = "Log2(Fold Change) of gene in the 2Ep cell when compared to the whole embryo. Less than zero is enriched in the 1E cell. Greater than zero is enriched in the whole 16 cell embryo",
   source_DOI = "10.1016/j.devcel.2016.07.025",
-  source_detail = "Single cell RNA-seq of hand dissected embryo. Accessed from tintori.bio.unc.edu."
+  source_detail = "Single cell RNA-seq of hand dissected embryo. Accessed from tintori.bio.unc.edu.",
+  seq_method = "Illumina"
   )
 
 ```
@@ -223,7 +238,7 @@ RWC19_Metadata <- RWC19_Metadata %>% add_row(
 
 ```{r}
 # TFs from Hashimshony endoderm genes
-hashimshony_embryo <- read.csv("../../10_DATASETS/12_Hashimshony_et_al_2015_CEL-seq/Hashimshony_Endoderm_Genes.csv", header = TRUE)
+hashimshony_embryo <- read.csv("../02_Data/1_Hashimshony_et_al_2015_CEL-seq/Hashimshony_Endoderm_Genes.csv", header = TRUE)
 colnames(hashimshony_embryo) <- c("hashimshony_embryo_genes")
 int_TF_df <- int_TF_df %>% mutate(hashimshony_embryo_bool = if_else(int_TF_df$Public_name %in% hashimshony_embryo$hashimshony_embryo_genes, TRUE, FALSE))
 
@@ -233,7 +248,8 @@ RWC19_Metadata <- RWC19_Metadata %>% add_row(
   column_ID = colnames(hashimshony_embryo[1]),
   column_detail = "Gene public name",
   source_DOI = "10.1038/nature13996",
-  source_detail = "Supplementary Table 4. Endoderm gene set from Single cell RNA-seq of cultured dissociated embryos."
+  source_detail = "Supplementary Table 4. Endoderm gene set from Single cell RNA-seq of cultured dissociated embryos.",
+  seq_method = "Illumina"
   )
 
 ```
@@ -243,15 +259,15 @@ RWC19_Metadata <- RWC19_Metadata %>% add_row(
 
 ```{r}
 # Tfs from Blaize et al PAB-1 pulldown
-blazieGenes <- read_excel("../../10_DATASETS/13_Blazie_et_al_2015_PAB-1_Pulldown_RNA-seq/Blazie_et_al_2015_Table_S3_ges-1_all_genes.xlsx")
+blazieGenes <- read_excel("../02_Data/2_Blazie_et_al_2015_PAB-1_Pulldown_RNA-seq/Blazie_et_al_2015_Table_S3_ges-1_all_genes.xlsx")
 blazieGenesSubset <- data.frame(blazie_WBGeneID = blazieGenes[1], blazie_FPKM = blazieGenes[8])
-colnames(blazieGenesSubset) <- c("blazie_WBGeneID", "blazie_FPKM")
+colnames(blazieGenesSubset) <- c("blazie_mixed_WBGeneID", "blazie_mixed_FPKM")
 
 #View(blaizeGenesSubset)
-int_TF_df <- merge(x = int_TF_df, y = blazieGenesSubset, by.x = "WBGeneID", by.y = "blazie_WBGeneID", all.x = TRUE)
+int_TF_df <- merge(x = int_TF_df, y = blazieGenesSubset, by.x = "WBGeneID", by.y = "blazie_mixed_WBGeneID", all.x = TRUE)
 
 # add boolian column
-int_TF_df <- int_TF_df %>% mutate(blazie_bool = if_else(int_TF_df$WBGeneID %in% blazieGenesSubset$blazie_WBGeneID, TRUE, FALSE))
+int_TF_df <- int_TF_df %>% mutate(blazie_mixed_bool = if_else(int_TF_df$WBGeneID %in% blazieGenesSubset$blazie_mixed_WBGeneID, TRUE, FALSE))
 
 # update metadata
 
@@ -264,7 +280,8 @@ RWC19_Metadata <- RWC19_Metadata %>% add_row(
   column_ID = colnames(blazieGenesSubset[2]),
   column_detail = "Fragments per thousand base pairs per million mapped reads",
   source_DOI = "10.1186/s12915-015-0116-6",
-  source_detail = "Table S3. RNA-seq of ges-1P::PAB-1 pulldown"
+  source_detail = "Table S3. RNA-seq of ges-1P::PAB-1 pulldown",
+  seq_method = "Illumina"
   )
 ```
 
@@ -273,56 +290,64 @@ RWC19_Metadata <- RWC19_Metadata %>% add_row(
 
 ```{r}
 # TFs from Haenni et al intestine FANS
-haenniGenes <- read.csv("../../10_DATASETS/14_Haenni_et_al_Intestine_Nuclei_3end-seq/gks282_supplementary_data/nar-00455-f-2012-File008.csv", header = TRUE)
+haenniGenes <- read.csv("../02_Data/3_Haenni_et_al_Intestine_Nuclei_3end-seq/gks282_supplementary_data/nar-00455-f-2012-File008.csv", header = TRUE)
 
 # compute log2 fold change of the RPM value between "Sorted" intestine cells and "Unsorted"
 haenniGenes <- haenniGenes %>% mutate(log2RPM = log2(haenniGenes$Sorted..RPM.+0.01)/(haenniGenes$Unsorted..RPM.+0.01))
 colnames(haenniGenes) <- c("gene", "geneID", "refID", "chrom", "strand", "unsorted", "sorted", "pvalue", "group", "log2RPM")
-colnames(haenniGenes) <- str_c("haenni_FANS_", colnames(haenniGenes))
+colnames(haenniGenes) <- str_c("haenni_mixed_", colnames(haenniGenes))
 haenni_subset <- data.frame(haenniGenes[1], haenniGenes[6], haenniGenes[7], haenniGenes[8], haenniGenes[9], haenniGenes[10])
 
 #add to master dataframe
-int_TF_df <- merge(x = int_TF_df, y = haenni_subset, by.x = "Sequence.name", by.y = "haenni_FANS_gene", all.x = TRUE)
+int_TF_df <- merge(x = int_TF_df, y = haenni_subset, by.x = "Sequence.name", by.y = "haenni_mixed_gene", all.x = TRUE)
 
 # compute boolian present/absent column based on authors grouping
-haenni_subset_intestine <- haenni_subset %>% filter(haenni_FANS_group == "Sorted")
-int_TF_df <- int_TF_df%>% mutate(haenni_FANS_bool = if_else(int_TF_df$Sequence.name %in% haenni_subset_intestine$haenni_FANS_gene, TRUE, FALSE))
+haenni_subset_intestine <- haenni_subset %>% filter(haenni_mixed_group == "Sorted")
+int_TF_df <- int_TF_df%>% mutate(haenni_FANS_bool = if_else(int_TF_df$Sequence.name %in% haenni_subset_intestine$haenni_mixed_gene, TRUE, FALSE))
+
 
 RWC19_Metadata <- RWC19_Metadata  %>% add_row(
   column_ID = colnames(haenni_subset[1]),
   column_detail = "Wormbase Gene ID",
   source_DOI = "10.1093/nar/gks282",
-  source_detail = "Table S3. RNA-seq of ges-1P::PAB-1 pulldown"
+  source_detail = "Supplementay File 8. RNA-seq of ges-1P::PAB-1 pulldown",
+  seq_method = "Illumina"
   ) %>% add_row(
   column_ID = colnames(haenni_subset[2]),
   column_detail = "RPM of total nuclei in mixed stage worms",
   source_DOI = "10.1093/nar/gks282",
-  source_detail = "Table S3. RNA-seq of ges-1P::PAB-1 pulldown"
+  source_detail = "Table S3. RNA-seq of ges-1P::PAB-1 pulldown",
+  seq_method = "Illumina"
   ) %>% add_row(
   column_ID = colnames(haenni_subset[3]),
   column_detail = "RPM of intestine enriched nuclei in mixed stage worms. Sorting based on elt-2P::GFP::H2B JM149",
   source_DOI = "10.1093/nar/gks282",
-  source_detail = "Table S3. RNA-seq of ges-1P::PAB-1 pulldown"
+  source_detail = "Table S3. RNA-seq of ges-1P::PAB-1 pulldown",
+  seq_method = "Illumina"
   )%>% add_row(
   column_ID = colnames(haenni_subset[4]),
   column_detail = "Fisher's exact p-value of intestine enriched genes",
   source_DOI = "10.1093/nar/gks282",
-  source_detail = "Table S3. RNA-seq of ges-1P::PAB-1 pulldown"
+  source_detail = "Table S3. RNA-seq of ges-1P::PAB-1 pulldown",
+  seq_method = "Illumina"
   ) %>% add_row(
   column_ID = colnames(haenni_subset[5]),
   column_detail = "Categorization of genes. Sorted = intestine enriched, Unsorted = whole worm enriched, Other = somewhere in the middle? ",
   source_DOI = "10.1093/nar/gks282",
-  source_detail = "Table S3. RNA-seq of ges-1P::PAB-1 pulldown"
+  source_detail = "Table S3. RNA-seq of ges-1P::PAB-1 pulldown",
+  seq_method = "Illumina"
   ) %>% add_row(
   column_ID = colnames(haenni_subset[6]),
   column_detail = "Log2(Sorted RPM/Unsorted RPM). Greater than zero is intestine enriched, less than zero is whole worm enriched",
   source_DOI = "10.1093/nar/gks282",
-  source_detail = "Table S3. RNA-seq of ges-1P::PAB-1 pulldown"
+  source_detail = "Table S3. RNA-seq of ges-1P::PAB-1 pulldown",
+  seq_method = "Illumina"
   ) %>% add_row(
   column_ID = "haenni_FANS_bool",
   column_detail = "True if in the 'Sorted' group ",
   source_DOI = "10.1093/nar/gks282",
-  source_detail = "Table S3. RNA-seq of ges-1P::PAB-1 pulldown"
+  source_detail = "Table S3. RNA-seq of ges-1P::PAB-1 pulldown",
+  seq_method = "Illumina"
   )
 
 ```
@@ -332,7 +357,7 @@ RWC19_Metadata <- RWC19_Metadata  %>% add_row(
 
 ```{r}
 # TFs from Pauli et al 
-pauliGenes <- read_excel("../../10_DATASETS/15_Pauli_et_al_2006_PAB-1_Pulldown_microarray/SupTable1_intestine_enriched_genes.xlsx")
+pauliGenes <- read_excel("../02_Data/4_Pauli_et_al_2006_PAB-1_Pulldown_microarray/SupTable1_intestine_enriched_genes.xlsx")
 colnames(pauliGenes) <- str_c("pauli_L4_", c("gene", "percentile", "pvalue", "description"))
 
 # add to master datatable
@@ -370,6 +395,13 @@ RWC19_Metadata <- RWC19_Metadata  %>% add_row(
   source_detail = "Supplementary Table 1. Microarray of ges-1P::PAB-1 pulldown in L4 worms"
   ) 
 
+# add sequencing method column
+
+RWC19_Metadata <- mutate(RWC19_Metadata, seq_method = ifelse(RWC19_Metadata$column_ID %in% c(colnames(pauliGenes), "pauli_L4_bool"), "Microarray",RWC19_Metadata$seq_method))
+
+# subset the pauli rows with `ifelse` and `%in%`, replace the NA in `seq_method` with "Microarray"
+# if the value does not come from pauli, then place the original string from RWC19_Metadata
+
 ```
 
 # A spatial and temporal map of C. elegans gene expression. Genome Research, 21(2), 325–41. https://doi.org/10.1101/gr.114595.110 
@@ -378,7 +410,7 @@ RWC19_Metadata <- RWC19_Metadata  %>% add_row(
 ```{r}
 
 # Late embryo intestine from Spencer et al
-spencerLEgenes <- read.table("../../10_DATASETS/16_Spencer_et_al_2010_FACS_and_pulldown_tilling_array/LE-intestine_enr_vs_ref.WS200.txt", quote="\"", comment.char="", header = TRUE)
+spencerLEgenes <- read.table("../02_Data/6_Spencer_et_al_2010_FACS_and_pulldown_tilling_array/LE-intestine_enr_vs_ref.WS200.txt", quote="\"", comment.char="", header = TRUE)
 colnames(spencerLEgenes) <- str_c("spencer_LE_", colnames(spencerLEgenes))
 spencer_LE_subset <- spencerLEgenes %>% select(spencer_LE_ID, spencer_LE_AveExpr, spencer_LE_adj_P_Val, spencer_LE_FC)
 
@@ -390,7 +422,7 @@ int_TF_df <- int_TF_df %>% mutate(spencer_LE_bool = if_else(int_TF_df$WBGeneID %
 
 
 # L2 intestine genes from Spencer et al
-spencerL2genes <- read.table("../../10_DATASETS/16_Spencer_et_al_2010_FACS_and_pulldown_tilling_array/L2-intestine_enr_vs_ref.WS200.txt", quote="\"", comment.char="", header = TRUE)
+spencerL2genes <- read.table("../02_Data/6_Spencer_et_al_2010_FACS_and_pulldown_tilling_array/L2-intestine_enr_vs_ref.WS200.txt", quote="\"", comment.char="", header = TRUE)
 colnames(spencerL2genes) <- str_c("spencer_L2_", colnames(spencerL2genes))
 spencer_L2_subset <- spencerL2genes %>% select(spencer_L2_ID, spencer_L2_AveExpr, spencer_L2_adj_P_Val, spencer_L2_FC)
 
@@ -426,6 +458,8 @@ RWC19_Metadata <- RWC19_Metadata  %>% add_row(
   source_detail = "FACS Sorted ELT-2::GFP worms. https://www.vanderbilt.edu/wormdoc/wormmap"
   )
 
+RWC19_Metadata <- mutate(RWC19_Metadata, seq_method = ifelse(RWC19_Metadata$column_ID %in% c(colnames(spencer_LE_subset), "spencer_LE_bool"), "Microarray",RWC19_Metadata$seq_method))
+
 RWC19_Metadata <- RWC19_Metadata  %>% add_row(
   column_ID = colnames(spencer_L2_subset[1]),
   column_detail = "Wormbase Gene ID",
@@ -453,6 +487,8 @@ RWC19_Metadata <- RWC19_Metadata  %>% add_row(
   source_detail = "FACS Sorted ELT-2::GFP worms. https://www.vanderbilt.edu/wormdoc/wormmap"
   )
 
+RWC19_Metadata <- mutate(RWC19_Metadata, seq_method = ifelse(RWC19_Metadata$column_ID %in% c(colnames(spencer_L2_subset), "spencer_L2_bool"), "Microarray",RWC19_Metadata$seq_method))
+
 ```
 
 #  Quantitating transcription factor redundancy: The relative roles of the ELT-2 and ELT-7 GATA factors in the C. elegans endoderm. Developmental Biology, 435(2), 150–161. https://doi.org/10.1016/J.YDBIO.2017.12.023
@@ -465,7 +501,7 @@ RWC19_Metadata <- RWC19_Metadata  %>% add_row(
 # ELT-2 stage specific Binding Data
 
 ```{r}
-ELT2_EE_LE_L3_Peaks <- read.delim("./valerie_peaks_processed.bedlike")
+ELT2_EE_LE_L3_Peaks <- read.delim("../02_Data/valerie_peaks_processed.bedlike")
 
 ELT2_peak_k1 <- ELT2_EE_LE_L3_Peaks %>% filter(kclust_mapping == 1) %>% select(WBID) %>% na.omit() %>% unique()
 ELT2_peak_k2 <- ELT2_EE_LE_L3_Peaks %>% filter(kclust_mapping == 2) %>% select(WBID) %>% na.omit() %>% unique()
@@ -488,16 +524,18 @@ int_TF_df <- int_TF_df %>% mutate(ELT2_peak_k_na_bool = if_else(int_TF_df$WBGene
 # Export the dataframe
 
 ```{r}
-write.csv(int_TF_df, "./intestine_TF_database.csv")
-write.csv(RWC19_Metadata, "./intestine_TF_metadata.csv")
+write.csv(int_TF_df, "../03_Output/intestine_TF_database.csv")
+write.csv(RWC19_Metadata, "../03_Output/intestine_TF_metadata.csv")
 ```
+
+# Manipulations
 
 Now make a master table that records presence/absence in these data sets
 
 ```{r}
 
 
-clustMatrix <- int_TF_df %>% select(hashimshony_embryo_bool, pauli_L4_bool, spencer_LE_bool, spencer_L2_bool, tintori_1E_bool, tintori_2Ep_bool, onish_adult_bool, haenni_FANS_bool, blazie_bool, ELT2_peak_k1_bool, ELT2_peak_k2_bool, ELT2_peak_k3_bool, ELT2_peak_k4_bool, ELT2_peak_k_na_bool)
+clustMatrix <- int_TF_df %>% select(hashimshony_embryo_bool, pauli_L4_bool, spencer_LE_bool, spencer_L2_bool, tintori_1E_bool, tintori_2Ep_bool, onish_adult_bool, haenni_FANS_bool, blazie_mixed_bool, ELT2_peak_k1_bool, ELT2_peak_k2_bool, ELT2_peak_k3_bool, ELT2_peak_k4_bool, ELT2_peak_k_na_bool)
 rownames(clustMatrix) <- int_TF_df$WBGeneID
 
 clustMatrixZeroOne <- data.frame(ifelse(clustMatrix == TRUE, 1,0), WBGeneID = int_TF_df$WBGeneID)
@@ -512,7 +550,7 @@ pheatmap(clustMatrixZeroOne[,1:14])
 
 ```{r}
 
-nonzeroClustMatrixZeroOne <- clustMatrixZeroOne %>% filter(haenni_FANS_bool == 1 | hashimshony_embryo_bool == 1 | spencer_LE_bool == 1 | spencer_L2_bool == 1 | tintori_1E_bool == 1 | tintori_2Ep_bool == 1 | onish_adult_bool == 1 | haenni_FANS_bool == 1 | blazie_bool ==1 | ELT2_peak_k1_bool == 1 | ELT2_peak_k2_bool == 1 | ELT2_peak_k3_bool == 1 | ELT2_peak_k4_bool == 1 | ELT2_peak_k_na_bool == 1) # removes rows that have zero for all columns
+nonzeroClustMatrixZeroOne <- clustMatrixZeroOne %>% filter(haenni_FANS_bool == 1 | hashimshony_embryo_bool == 1 | spencer_LE_bool == 1 | spencer_L2_bool == 1 | tintori_1E_bool == 1 | tintori_2Ep_bool == 1 | onish_adult_bool == 1 | haenni_FANS_bool == 1 | blazie_mixed_bool ==1 | ELT2_peak_k1_bool == 1 | ELT2_peak_k2_bool == 1 | ELT2_peak_k3_bool == 1 | ELT2_peak_k4_bool == 1 | ELT2_peak_k_na_bool == 1) # removes rows that have zero for all columns
 dim(nonzeroClustMatrixZeroOne)
 pheatmap(nonzeroClustMatrixZeroOne[,1:14])
 ```
@@ -521,5 +559,11 @@ pheatmap(nonzeroClustMatrixZeroOne[,1:14])
 ```{r}
 clustMatrixZeroOne %>% filter(ELT2_peak_k4_bool == 1)
 
+```
+
+Make a list of genes that are present in the hashimsony, tintori 2E and spencer late emrbyo sets
+
+```{r}
+int_TF_df %>% select(WBGeneID, Sequence.name, Public_name, tintori_1E_bool, tintori_2Ep_bool, hashimshony_embryo_bool, spencer_LE_bool) %>% filter(hashimshony_embryo_bool == 1 & tintori_2Ep_bool == 1 & spencer_LE_bool == 1)
 ```
 
