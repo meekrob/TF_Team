@@ -151,6 +151,14 @@ tintori_2Ep_enriched <- int_TF_df %>% filter(int_TF_df$tintori_2Ep_p.value <= 0.
 
 int_TF_df <- int_TF_df %>% mutate(tintori_2Ep_bool = if_else(int_TF_df$WBGeneID %in% tintori_2Ep_enriched$WBGeneID, TRUE, FALSE))
 
+# Transcripts from embryonic EMS cell from Sophie's single cell RNA-seq paper.
+tintori_EMS <- read.csv("../02_Data/7_Tintori_et_al_2016_Embryo_scRNA-seq/4cell_vs_EMS_p1_00.csv")
+colnames(tintori_EMS) <- str_c("tintori_EMS_", tintori_columns)
+int_TF_df <- merge(x = int_TF_df, y = tintori_EMS, by.x = "Public_name", by.y = "tintori_EMS_gene", all.x = T)
+tintori_EMS_enriched <- int_TF_df %>% filter(int_TF_df$tintori_2Ep_p.value <= 0.05 & int_TF_df$tintori_2Ep_log.FC < 0)
+
+int_TF_df <- int_TF_df %>% mutate(tintori_EMS_bool = if_else(int_TF_df$WBGeneID %in% tintori_EMS_enriched$WBGeneID, TRUE, FALSE))
+
 # Update metadata
 
 RWC19_Metadata <- RWC19_Metadata %>% add_row(
@@ -205,6 +213,31 @@ RWC19_Metadata <- RWC19_Metadata %>% add_row(
   seq_method = "Illumina"
   )
 
+RWC19_Metadata <- RWC19_Metadata %>% add_row(
+  column_ID = colnames(tintori_EMS[1]),
+  column_detail = "Gene sequence name",
+  source_DOI = "10.1016/j.devcel.2016.07.025",
+  source_detail = "Single cell RNA-seq of hand dissected embryo. Accessed from tintori.bio.unc.edu.",
+  seq_method = "Illumina"
+  ) %>% add_row(
+  column_ID = colnames(tintori_EMS[2]),
+  column_detail = "Gene p-value",
+  source_DOI = "10.1016/j.devcel.2016.07.025",
+  source_detail = "Single cell RNA-seq of hand dissected embryo. Accessed from tintori.bio.unc.edu.",
+  seq_method = "Illumina"
+  ) %>% add_row(
+  column_ID = colnames(tintori_EMS[3]),
+  column_detail = "Counts per transcript per million mapped reads.",
+  source_DOI = "10.1016/j.devcel.2016.07.025",
+  source_detail = "Single cell RNA-seq of hand dissected embryo. Accessed from tintori.bio.unc.edu.",
+  seq_method = "Illumina"
+  ) %>% add_row(
+  column_ID = colnames(tintori_EMS[4]),
+  column_detail = "Log2(Fold Change) of gene in the EMS cell when compared to the whole embryo. Less than zero is enriched in the EMS cell. Greater than zero is enriched in the whole 8 cell embryo",
+  source_DOI = "10.1016/j.devcel.2016.07.025",
+  source_detail = "Single cell RNA-seq of hand dissected embryo. Accessed from tintori.bio.unc.edu.",
+  seq_method = "Illumina"
+  )
 ```
 
 # A lineage-resolved molecular atlas of C. elegans embryogenesis at single cell resolution
