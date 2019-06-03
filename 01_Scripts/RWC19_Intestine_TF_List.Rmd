@@ -129,7 +129,7 @@ RWC19_Metadata <- RWC19_Metadata %>% add_row(
 ```{r}
 # Transcripts from embryonic 1E intestine from Sophie's single cell RNA-seq paper. See `intestine_tfs.Rmd`
 tintori_columns <- c("gene", "p.value", "log.CPM", "log.FC")
-tintori_1E <- read.csv("../02_Data/7_Tintori_et_al_2016_Embryo_scRNA-seq/8cell_vs_1E_p1_00.csv")
+tintori_1E <- read.csv("../02_Data/7_Tintori_et_al_2016_Embryo_scRNA-seq/8cell_vs_1E_p1_00.csv", header = FALSE)
 colnames(tintori_1E) <- str_c("tintori_1E_", tintori_columns)
 
 int_TF_df <- merge(x = int_TF_df, y = tintori_1E, by.x = "Public_name", by.y = "tintori_1E_gene", all.x = T)
@@ -141,7 +141,7 @@ tintori_1E_enriched <- int_TF_df %>% filter(int_TF_df$tintori_1E_p.value <= 0.05
 int_TF_df <- int_TF_df %>% mutate(tintori_1E_bool = if_else(int_TF_df$WBGeneID %in% tintori_1E_enriched$WBGeneID, TRUE, FALSE))
 
 # Transcripts from embryonic 2Ep intestine from Sophie's single cell RNA-seq paper. See `intestine_tfs.Rmd`
-tintori_2Ep <- read.csv("../02_Data/7_Tintori_et_al_2016_Embryo_scRNA-seq/16cell_vs_Ep_p1_00.csv")
+tintori_2Ep <- read.csv("../02_Data/7_Tintori_et_al_2016_Embryo_scRNA-seq/16cell_vs_Ep_p1_00.csv", header = FALSE)
 colnames(tintori_2Ep) <- str_c("tintori_2Ep_", tintori_columns)
 
 int_TF_df <- merge(x = int_TF_df, y = tintori_2Ep, by.x = "Public_name", by.y = "tintori_2Ep_gene", all.x = T)
@@ -152,10 +152,10 @@ tintori_2Ep_enriched <- int_TF_df %>% filter(int_TF_df$tintori_2Ep_p.value <= 0.
 int_TF_df <- int_TF_df %>% mutate(tintori_2Ep_bool = if_else(int_TF_df$WBGeneID %in% tintori_2Ep_enriched$WBGeneID, TRUE, FALSE))
 
 # Transcripts from embryonic EMS cell from Sophie's single cell RNA-seq paper.
-tintori_EMS <- read.csv("../02_Data/7_Tintori_et_al_2016_Embryo_scRNA-seq/4cell_vs_EMS_p1_00.csv")
+tintori_EMS <- read.csv("../02_Data/7_Tintori_et_al_2016_Embryo_scRNA-seq/4cell_vs_EMS_p1_00.csv", header = FALSE)
 colnames(tintori_EMS) <- str_c("tintori_EMS_", tintori_columns)
 int_TF_df <- merge(x = int_TF_df, y = tintori_EMS, by.x = "Public_name", by.y = "tintori_EMS_gene", all.x = T)
-tintori_EMS_enriched <- int_TF_df %>% filter(int_TF_df$tintori_2Ep_p.value <= 0.05 & int_TF_df$tintori_2Ep_log.FC < 0)
+tintori_EMS_enriched <- int_TF_df %>% filter(int_TF_df$tintori_EMS_p.value <= 0.05 & int_TF_df$tintori_EMS_log.FC < 0)
 
 int_TF_df <- int_TF_df %>% mutate(tintori_EMS_bool = if_else(int_TF_df$WBGeneID %in% tintori_EMS_enriched$WBGeneID, TRUE, FALSE))
 
@@ -559,6 +559,12 @@ int_TF_df <- int_TF_df %>% mutate(ELT2_peak_k_na_bool = if_else(int_TF_df$WBGene
 ```{r}
 write.csv(int_TF_df, "../03_Output/intestine_TF_database.csv")
 write.csv(RWC19_Metadata, "../03_Output/intestine_TF_metadata.csv")
+
+# generate a boolian only dataframe for ease of browsing
+
+int_TF_df_bool_only <- int_TF_df %>% select(WBGeneID, Sequence.name, Public_name, hashimshony_embryo_bool, pauli_L4_bool, spencer_LE_bool, spencer_L2_bool, tintori_1E_bool, tintori_2Ep_bool, tintori_EMS_bool,onish_adult_bool, haenni_FANS_bool, blazie_mixed_bool, ELT2_peak_k1_bool, ELT2_peak_k2_bool, ELT2_peak_k3_bool, ELT2_peak_k4_bool, ELT2_peak_k_na_bool)
+
+write.csv(int_TF_df_bool_only, "../03_Output/intestine_TF_database_bool_only.csv")
 ```
 
 # Manipulations
