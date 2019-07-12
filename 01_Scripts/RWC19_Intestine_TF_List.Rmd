@@ -606,3 +606,52 @@ Make a list of genes that are present in the hashimsony, tintori 2E and spencer 
 int_TF_df %>% select(WBGeneID, Sequence.name, Public_name, tintori_1E_bool, tintori_2Ep_bool, hashimshony_embryo_bool, spencer_LE_bool) %>% filter(hashimshony_embryo_bool == 1 & tintori_2Ep_bool == 1 & spencer_LE_bool == 1)
 ```
 
+Try to make a figure that clusters Sophie Tintories EMS, 1E, and 2Ep embryo intestine data
+
+```{r}
+int_TF_df_tintori <- int_TF_df %>% select(Public_name, tintori_EMS_log.FC, tintori_1E_log.FC, tintori_2Ep_log.FC)
+int_TF_df_tintori <- int_TF_df_tintori %>% mutate(tintori_EMS_log.FC = tintori_EMS_log.FC*-1, tintori_1E_log.FC=tintori_1E_log.FC*-1, tintori_2Ep_log.FC = tintori_2Ep_log.FC*-1)
+
+#subset for genes that have a foldchange of greater or less than one
+int_tf_df_tintori_filtered <- int_TF_df_tintori %>% filter(tintori_EMS_log.FC > 1 | tintori_1E_log.FC > 1 | tintori_2Ep_log.FC > 1)
+dim(int_tf_df_tintori_filtered)
+rownames(int_tf_df_tintori_filtered) <- int_tf_df_tintori_filtered$Public_name
+
+# Set remaining NA rows to zero
+int_tf_df_tintori_filtered[is.na(int_tf_df_tintori_filtered)] <- 0
+
+int_TF_df_tintori_heatmap <- pheatmap(int_tf_df_tintori_filtered[,2:4], cluster_cols = F, cellwidth = 10, cellheight = 10, filename = "Intestine_TF_Tintori_Heatmap.pdf")
+
+
+```
+
+A different Approach
+```{r}
+#Remove rows that all contain NA
+int_TF_df_tintori_reduced <- int_TF_df_tintori %>% filter(!(is.na(tintori_EMS_log.FC)) |!(is.na(tintori_1E_log.FC)) |!(is.na(tintori_2Ep_log.FC)) ) 
+
+# Set remaining NA rows to zero
+int_TF_df_tintori_reduced[is.na(int_TF_df_tintori_reduced)] <- 0
+
+rownames(int_TF_df_tintori_reduced) <- int_TF_df_tintori_reduced$Public_name
+dim(int_TF_df_tintori_reduced)
+pheatmap(int_TF_df_tintori_reduced[,2:4])
+
+
+
+# Subset for only the genes that I have given to Nicolai
+
+tf_of_interest <- c("end-1","nhr-57","F21A9.2","end-3","med-1","tbx-8","F21G4.5","nhr-53","nhr-69","prx-5","elt-7","elt-2","nhr-131","nhr-232","nhr-139","dve-1","pqm-1","nhr-45","K05F1.5","tbx-8","sknr-1")
+
+int_TF_df_tintori_of_interest <- int_TF_df_tintori[tf_of_interest,]
+
+# reverse scale of tintori columns, multiply by one
+
+int_TF_df_tintori_of_interest_invert <- int_TF_df_tintori_of_interest %>% mutate(tintori_1E_log.FC = tintori_1E_log.FC*-1, tintori_EMS_log.FC= tintori_EMS_log.FC*-1, tintori_2Ep_log.FC = tintori_2Ep_log.FC*-1)
+
+rownames(int_TF_df_tintori_of_interest_invert) <- rownames(int_TF_df_tintori_of_interest)
+
+int_TF_df_tintori_of_interest_invert[is.na(int_TF_df_tintori_of_interest_invert)] <- 0
+pheatmap(int_TF_df_tintori_of_interest_invert, cluster_cols = F)
+```
+
