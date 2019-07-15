@@ -652,6 +652,6 @@ int_TF_df_tintori_of_interest_invert <- int_TF_df_tintori_of_interest %>% mutate
 rownames(int_TF_df_tintori_of_interest_invert) <- rownames(int_TF_df_tintori_of_interest)
 
 int_TF_df_tintori_of_interest_invert[is.na(int_TF_df_tintori_of_interest_invert)] <- 0
-pheatmap(int_TF_df_tintori_of_interest_invert, cluster_cols = F)
+pheatmap(int_TF_df_tintori_of_interest_invert, cluster_cols = F, filename = "../03_Output/190715_Intestine_TF_Tintori_Heatmap_Subset.pdf")
 ```
 
