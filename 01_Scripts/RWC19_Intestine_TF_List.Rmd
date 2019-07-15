@@ -620,7 +620,7 @@ rownames(int_tf_df_tintori_filtered) <- int_tf_df_tintori_filtered$Public_name
 # Set remaining NA rows to zero
 int_tf_df_tintori_filtered[is.na(int_tf_df_tintori_filtered)] <- 0
 
-int_TF_df_tintori_heatmap <- pheatmap(int_tf_df_tintori_filtered[,2:4], cluster_cols = F, cellwidth = 10, cellheight = 10, filename = "Intestine_TF_Tintori_Heatmap.pdf")
+int_TF_df_tintori_heatmap <- pheatmap(int_tf_df_tintori_filtered[,2:4], cluster_cols = F, cellwidth = 10, cellheight = 10, filename = "../03_Output/Intestine_TF_Tintori_Heatmap.pdf")
 
 
 ```
